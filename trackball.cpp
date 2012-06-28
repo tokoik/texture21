@@ -4,7 +4,9 @@
 #include <math.h>
 #include "trackball.h"
 
-#define M_PI 3.14159265358979323846
+#ifndef M_PI
+#  define M_PI 3.14159265358979323846
+#endif
 
 /* ドラッグ開始位置 */
 static int cx, cy;

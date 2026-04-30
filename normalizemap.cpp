@@ -1,4 +1,4 @@
-#include <math.h>
+﻿#include <math.h>
 #if defined(WIN32)
 #  include "glut.h"
 #elif defined(__APPLE__) || defined(MACOSX)

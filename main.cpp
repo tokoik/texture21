@@ -1,7 +1,7 @@
 ﻿#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#if defined(WIN32)
+#if defined(_WIN32)
 //#  pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
 #  include "glut.h"
 #  include "glext.h"
@@ -44,7 +44,7 @@ static const GLfloat lightamb[] = { 0.1, 0.1, 0.1, 1.0 }; /* 環境光強度 */
 */
 static void init(void)
 {
-#if defined(WIN32)
+#if defined(_WIN32)
   glActiveTexture =
     (PFNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture");
   glMultiTexCoord3dv =

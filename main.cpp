@@ -1,18 +1,17 @@
-﻿#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#if defined(_WIN32)
-//#  pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
-#  include "glut.h"
-#  include "glext.h"
-PFNGLACTIVETEXTUREPROC glActiveTexture;
-PFNGLMULTITEXCOORD3DVPROC glMultiTexCoord3dv;
-#elif defined(__APPLE__) || defined(MACOSX)
+﻿#if defined(__APPLE__)
+#  define GL_SILENCE_DEPRECATION
 #  include <GLUT/glut.h>
 #else
-#  define GL_GLEXT_PROTOTYPES
+#  if defined(_WIN32)
+//#    pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
+#    define _USE_MATH_DEFINES
+#    define _CRT_SECURE_NO_WARNINGS
+#  endif
 #  include <GL/glut.h>
 #endif
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
 /* トラックボール処理用関数の宣言 */
 #include "trackball.h"
@@ -29,15 +28,15 @@ PFNGLMULTITEXCOORD3DVPROC glMultiTexCoord3dv;
 /*
 ** 光源
 */
-static const GLfloat lightpos[] = { 4.0, 5.0, 6.0, 1.0 }; /* 位置　　　 */
-static const GLfloat lightcol[] = { 1.0, 1.0, 1.0, 1.0 }; /* 直接光強度 */
-static const GLfloat lightamb[] = { 0.1, 0.1, 0.1, 1.0 }; /* 環境光強度 */
+static const GLfloat lightpos[] = { 4.0f, 5.0f, 6.0f, 1.0f }; /* 位置　　　 */
+static const GLfloat lightcol[] = { 1.0f, 1.0f, 1.0f, 1.0f }; /* 直接光強度 */
+static const GLfloat lightamb[] = { 0.1f, 0.1f, 0.1f, 1.0f }; /* 環境光強度 */
 
 /*
 ** テクスチャ
 */
-#define TEXWIDTH  256                      /* テクスチャの幅　　　 */
-#define TEXHEIGHT 256                      /* テクスチャの高さ　　 */
+#define TEXWIDTH  256                               /* テクスチャの幅　　　 */
+#define TEXHEIGHT 256                               /* テクスチャの高さ　　 */
 
 /*
 ** 初期化

@@ -1,19 +1,22 @@
-﻿#include <math.h>
-#if defined(WIN32)
-#  include "glut.h"
-#  include "glext.h"
-extern PFNGLMULTITEXCOORD3DVPROC glMultiTexCoord3dv;
-#elif defined(__APPLE__) || defined(MACOSX)
+﻿#if defined(__APPLE__) || defined(MACOSX)
+#  define GL_SILENCE_DEPRECATION
 #  include <GLUT/glut.h>
+#  include <OpenGL/glext.h>
 #else
-#  define GL_GLEXT_PROTOTYPES
+#  if defined(_WIN32)
+#    define _USE_MATH_DEFINES
+#  endif
 #  include <GL/glut.h>
+#  include <GL/glext.h>
+#  if defined(_WIN32)
+extern PFNGLMULTITEXCOORD2DPROC glMultiTexCoord2d;
+extern PFNGLMULTITEXCOORD3DVPROC glMultiTexCoord3dv;
+#  endif
 #endif
 
 #include "sphere.h"
 #include "matrix.h"
-
-#define PI 3.14159265358979323846
+#include <math.h>
 
 /*
 ** ローカル座標系から n を法線ベクトルとする接空間の座標系への変換行列 t を求める
@@ -74,8 +77,6 @@ static void normalizeTexCoord(double n[], double p[], double ll[])
 {
   /* 接空間における光源位置 */
   double lt[4] = { ll[0], ll[1], ll[2], ll[3] };
-  /* ローカル座標系から接空間の座標系への変換行列 */
-  double t[16];
 
   /* 平行光線でなければ光源位置の実座標を求めておく */
   if (lt[3] != 0.0) {
@@ -83,6 +84,9 @@ static void normalizeTexCoord(double n[], double p[], double ll[])
     lt[1] = lt[1] / lt[3] - p[1];
     lt[2] = lt[2] / lt[3] - p[2];
   }
+
+  /* ローカル座標系から接空間の座標系への変換行列 */
+  double t[16];
 
   /* ローカル座標系から接空間の座標系への変換行列を求める */
   localToTangent(n, t);
@@ -99,29 +103,26 @@ static void normalizeTexCoord(double n[], double p[], double ll[])
 */
 void sphere(double radius, int slices, int stacks, const float l[])
 {
-  /* ローカル座標系における光源位置 */
-  double ll[4] = { l[0], l[1], l[2], l[3] };
-  /* モデルビュー変換行列の逆行列 */
-  double m[16];
-  
   /* 現在のモデルビュー変換行列の逆行列を求める */
+  double m[16];
   glGetDoublev(GL_MODELVIEW_MATRIX, m);
   inverse(m, m);
   
   /* ローカル座標系における光源位置を求める */
+  double ll[4] = { l[0], l[1], l[2], l[3] };
   transform(ll, m, ll);
   
   /* 球を描く */
   for (int j = 0; j < stacks; ++j) {
     double t0 = (double)j / (double)stacks;
     double t1 = (double)(j + 1) / (double)stacks;
-    double r0 = sin(PI * t0);
-    double r1 = sin(PI * t1);
+    double r0 = sin(M_PI * t0);
+    double r1 = sin(M_PI * t1);
     double n[2][3], p[2][3];
     
     /* 法線単位ベクトルの y 成分 */
-    n[0][1] = -cos(PI * t0);
-    n[1][1] = -cos(PI * t1);
+    n[0][1] = -cos(M_PI * t0);
+    n[1][1] = -cos(M_PI * t1);
     
     /* 頂点の y 座標値 */
     p[0][1] = radius * n[0][1];
@@ -134,7 +135,7 @@ void sphere(double radius, int slices, int stacks, const float l[])
     glBegin(GL_QUAD_STRIP);
     for (int i = 0; i <= slices; ++i) {
       double s = (double)i / (double)slices;
-      double a = -2.0 * PI * s;
+      double a = -2.0 * M_PI * s;
       
       /* 法線単位ベクトルの x, z 成分 */
       n[0][0] = r0 * cos(a);
@@ -152,19 +153,25 @@ void sphere(double radius, int slices, int stacks, const float l[])
       s *= 8.0;
       
       /* 法線マップのテクスチャ座標を設定する */
-      glTexCoord2d(s, t0);
+      glMultiTexCoord2d(GL_TEXTURE0, s, t0);
       
       /* 正規化マップのテクスチャ座標を設定する */
       normalizeTexCoord(n[0], p[0], ll);
+      
+      /* 拡散反射係数のテクスチャ座標を設定する */
+      glMultiTexCoord2d(GL_TEXTURE2, s, t0);
       
       /* 頂点位置 */
       glVertex3dv(p[0]);
       
       /* 法線マップのテクスチャ座標を設定する */
-      glTexCoord2d(s, t1);
+      glMultiTexCoord2d(GL_TEXTURE0, s, t1);
       
       /* 正規化マップのテクスチャ座標を設定する */
       normalizeTexCoord(n[1], p[1], ll);
+      
+      /* 拡散反射係数のテクスチャ座標を設定する */
+      glMultiTexCoord2d(GL_TEXTURE2, s, t1);
       
       /* 頂点位置 */
       glVertex3dv(p[1]);

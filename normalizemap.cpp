@@ -1,11 +1,10 @@
-﻿#include <math.h>
-#if defined(WIN32)
-#  include "glut.h"
-#elif defined(__APPLE__) || defined(MACOSX)
+﻿#if defined(__APPLE__) || defined(MACOSX)
+#  define GL_SILENCE_DEPRECATION
 #  include <GLUT/glut.h>
 #else
 #  include <GL/glut.h>
 #endif
+#include <math.h>
 
 #include "normalizemap.h"
 

@@ -9,6 +9,7 @@
 #  include <GL/glut.h>
 #endif
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 #include "normalmap.h"
@@ -19,17 +20,17 @@
 void makeNormalMap(GLubyte *tex, int width, int height, double nz, const char *name)
 {
   FILE *fp = fopen(name, "rb");
-  
+
   if (fp) {
     unsigned long size = width * height;
     unsigned char *map = (unsigned char *)malloc(size);
-    
+
     if (map) {
-      
+
       /* 高さマップを読み込む */
       fread(map, height, width, fp);
       fclose(fp);
-      
+
       for (unsigned long y = 0; y < size; y += width) {
         for (int x = 0; x < width; ++x) {
 
@@ -47,7 +48,7 @@ void makeNormalMap(GLubyte *tex, int width, int height, double nz, const char *n
           *(tex++) = 255;
         }
       }
-      
+
       free(map);
     }
   }
